@@ -49,6 +49,8 @@ class StreamWriter(object):
             with open(self.destination+self.filename, 'wb') as handle:
                 request = requests.get(self.server_url, stream=True)
                 self.metadata = request.headers
+                if 'icy-br' in self.metadata.keys():
+                  self.bitrate = float(self.metadata['icy-br'])
 
                 for block in request.iter_content(1024):
                     self.file_size += 1024.0
@@ -86,4 +88,4 @@ class StreamWriter(object):
         mp3.save()
 
     def calc_length(self):
-        self.stream_length = ( ( self.file_size/1024.0 ) * 8.0 )/128.0
+        self.stream_length = ( ( self.file_size/1024.0 ) * 8.0 )/self.bitrate
